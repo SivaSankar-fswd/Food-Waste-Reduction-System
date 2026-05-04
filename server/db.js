@@ -1,66 +1,102 @@
-const sqlite3 = require("sqlite3").verbose();
+const { Pool } = require("pg");
 const bcrypt = require("bcryptjs");
+require("dotenv").config();
 
-const db = new sqlite3.Database("./database.db", (err) => {
-  if (err) {
-    console.log("DB Connection Error:", err);
-  } else {
-    console.log("Connected to database.db");
+// Create a new pool using the connection string from environment variables
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+
+// Helper function to convert SQLite style '?' placeholders to PostgreSQL style '$1', '$2', etc.
+function convertSql(sql) {
+  let count = 1;
+  return sql.replace(/\?/g, () => `$${count++}`);
+}
+
+/**
+ * Compatibility layer to mimic the sqlite3 API
+ */
+const db = {
+  run: function (sql, params, callback) {
+    const pgSql = convertSql(sql);
+    pool.query(pgSql, params, (err, res) => {
+      // Mocking the 'this' context for sqlite3 if needed (e.g., lastID, changes)
+      const context = {
+        lastID: null, // PostgreSQL doesn't provide lastID easily without RETURNING clause
+        changes: res ? res.rowCount : 0
+      };
+      if (callback) callback.call(context, err);
+    });
+  },
+  get: function (sql, params, callback) {
+    const pgSql = convertSql(sql);
+    pool.query(pgSql, params, (err, res) => {
+      if (callback) callback(err, res && res.rows.length > 0 ? res.rows[0] : null);
+    });
+  },
+  all: function (sql, params, callback) {
+    const pgSql = convertSql(sql);
+    pool.query(pgSql, params, (err, res) => {
+      if (callback) callback(err, res ? res.rows : []);
+    });
   }
-});
+};
 
-// Users table
-db.run(`CREATE TABLE IF NOT EXISTS users (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  name TEXT,
-  email TEXT UNIQUE,
-  password TEXT,
-  role TEXT,
-  contact TEXT,
-  location TEXT,
-  photo TEXT
-)`);
+/**
+ * Initialize the PostgreSQL database schema
+ */
+const initDb = async () => {
+  try {
+    // Users table
+    await pool.query(`CREATE TABLE IF NOT EXISTS users (
+      id SERIAL PRIMARY KEY,
+      name TEXT,
+      email TEXT UNIQUE,
+      password TEXT,
+      role TEXT,
+      contact TEXT,
+      location TEXT,
+      photo TEXT
+    )`);
 
-// Add photo column to existing users table if not present
-db.run("ALTER TABLE users ADD COLUMN photo TEXT", (err) => {
-  // This may fail if column already exists; ignore that error.
-});
+    // Food posts table
+    await pool.query(`CREATE TABLE IF NOT EXISTS food_posts (
+      id SERIAL PRIMARY KEY,
+      donor_id INTEGER,
+      food_name TEXT,
+      quantity TEXT,
+      location TEXT,
+      contact TEXT,
+      status TEXT DEFAULT 'available',
+      receiver_name TEXT,
+      receiver_contact TEXT,
+      receiver_location TEXT,
+      receiver_id INTEGER,
+      expiry_date TEXT,
+      posted_date TEXT,
+      accepted_date TEXT,
+      latitude DOUBLE PRECISION,
+      longitude DOUBLE PRECISION
+    )`);
 
-// Food posts table
-db.run(`CREATE TABLE IF NOT EXISTS food_posts (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  donor_id INTEGER,
-  food_name TEXT,
-  quantity TEXT,
-  location TEXT,
-  contact TEXT,
-  status TEXT DEFAULT 'available',
-  receiver_name TEXT,
-  receiver_contact TEXT,
-  receiver_location TEXT
-)`);
-db.run(`ALTER TABLE food_posts ADD COLUMN receiver_id INTEGER`, ()=>{});
-db.run(`ALTER TABLE food_posts ADD COLUMN expiry_date TEXT`, ()=>{});
-db.run(`ALTER TABLE food_posts ADD COLUMN posted_date TEXT`, ()=>{});
-db.run(`ALTER TABLE food_posts ADD COLUMN accepted_date TEXT`, ()=>{});
-db.run(`ALTER TABLE food_posts ADD COLUMN latitude REAL`, ()=>{});
-db.run(`ALTER TABLE food_posts ADD COLUMN longitude REAL`, ()=>{});
-
-// Insert default admin user if not exists
-db.get("SELECT * FROM users WHERE email = ?", ["admin@foodwaste.com"], (err, row) => {
-  if (!row) {
-    const hashedPassword = bcrypt.hashSync("admin123", 8);
-    db.run("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", 
-      ["Admin User", "admin@foodwaste.com", hashedPassword, "admin"], 
-      (err) => {
-        if (err) {
-          console.log("Error inserting admin user:", err);
-        } else {
-          console.log("Default admin user created: admin@foodwaste.com / admin123");
-        }
-      }
-    );
+    // Insert default admin user if not exists
+    const adminCheck = await pool.query("SELECT * FROM users WHERE email = $1", ["admin@foodwaste.com"]);
+    if (adminCheck.rows.length === 0) {
+      const hashedPassword = bcrypt.hashSync("admin123", 8);
+      await pool.query(
+        "INSERT INTO users (name, email, password, role) VALUES ($1, $2, $3, $4)",
+        ["Admin User", "admin@foodwaste.com", hashedPassword, "admin"]
+      );
+      console.log("Default admin user created: admin@foodwaste.com / admin123");
+    }
+    
+    console.log("PostgreSQL Database initialized successfully");
+  } catch (err) {
+    console.error("PostgreSQL Initialization Error:", err);
   }
-});
+};
+
+// Run initialization
+initDb();
 
 module.exports = db;

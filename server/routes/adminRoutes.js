@@ -9,7 +9,7 @@ router.get("/monthly-posts", (req, res) => {
 
   db.all(
     `SELECT 
-      strftime('%m', posted_date) as month,
+      to_char(posted_date::timestamp, 'MM') as month,
       COUNT(*) as posts
      FROM food_posts
      GROUP BY month
