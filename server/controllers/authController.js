@@ -12,7 +12,12 @@ exports.register = (req, res) => {
 
   db.run(sql, [name, email, hashed, role, contact, location], function(err){
     if(err){
-      return res.status(400).json({error:"Email already exists"});
+      console.error("Registration Error:", err);
+      // In PostgreSQL, unique violation code is 23505
+      if (err.code === '23505') {
+        return res.status(400).json({error:"Email already exists"});
+      }
+      return res.status(500).json({error:"Database connection error. Check server logs."});
     }
     res.json({message:"User registered successfully.Please Login."});
   });
@@ -22,6 +27,10 @@ exports.login = (req, res) => {
   const { email, password } = req.body;
 
   db.get(`SELECT * FROM users WHERE email=?`, [email], (err, user)=>{
+    if (err) {
+      console.error("Login Database Error:", err);
+      return res.status(500).json({error: "Database error during login"});
+    }
     if(!user) return res.status(404).json({error:"User not found"});
 
     const passOk = bcrypt.compareSync(password, user.password);

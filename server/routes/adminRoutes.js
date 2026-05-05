@@ -1,9 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db");
-const { getDashboardStats } = require("../controllers/adminController");
+const { 
+  getDashboardStats, 
+  getAllUsers, 
+  deleteUser, 
+  getAllPosts, 
+  deletePost 
+} = require("../controllers/adminController");
 
 router.get("/stats", getDashboardStats);
+router.get("/users", getAllUsers);
+router.delete("/users/:id", deleteUser);
+router.get("/posts", getAllPosts);
+router.delete("/posts/:id", deletePost);
 
 router.get("/monthly-posts", (req, res) => {
 

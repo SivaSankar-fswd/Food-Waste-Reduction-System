@@ -13,7 +13,8 @@ exports.sendContactMail = async (req, res) => {
     });
 
     await transporter.sendMail({
-      from: email,
+      from: process.env.ADMIN_EMAIL,
+      replyTo: email,
       to: process.env.ADMIN_EMAIL,
       subject: "New Contact Message - Food Waste System",
       html: `
@@ -27,7 +28,10 @@ exports.sendContactMail = async (req, res) => {
     res.json({ message: "Email sent successfully" });
 
   } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: "Failed to send email" });
+    console.error("Error sending contact email:", error);
+    res.status(500).json({ 
+      error: "Failed to send email", 
+      details: error.message 
+    });
   }
 };

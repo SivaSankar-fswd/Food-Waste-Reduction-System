@@ -49,7 +49,7 @@ function FoodDetails() {
         <button className="back-btn" onClick={() => navigate(-1)}>← Back</button>
         
         <div className="details-header-section">
-          <img src={getFoodImage(food.food_name)} alt={food.food_name} className="details-hero-img" />
+          <img src={food.photo || getFoodImage(food.food_name)} alt={food.food_name} className="details-hero-img" />
           <div className="header-overlay">
             <h1>{food.food_name}</h1>
             <span className={`status-pill ${food.status}`}>{food.status}</span>

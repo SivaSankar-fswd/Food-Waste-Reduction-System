@@ -1,5 +1,5 @@
 import { useNavigate} from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import API from "../services/api";
 import "./Home.css";
 import heroImg from "../assets/hero.png";
@@ -13,6 +13,13 @@ const [form, setForm] = useState({
 });
 
 const [success, setSuccess] = useState("");
+
+useEffect(() => {
+  const role = localStorage.getItem("role");
+  if (role === "admin") {
+    navigate("/admin");
+  }
+}, [navigate]);
 
   const handleDonate = () => {
     const token = localStorage.getItem("token");
@@ -141,18 +148,18 @@ We aspire to encourage people, organizations, and institutions to treat food as 
 
 </div>
 
-           <div class="stats-container">
-                <div class="stat-box">
-                    <span class="stat-number">500K+</span>
-                    <span class="stat-label">Meals Redistributed</span>
+           <div className="stats-container">
+                <div className="stat-box">
+                    <span className="stat-number">500K+</span>
+                    <span className="stat-label">Meals Redistributed</span>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-number">10K+</span>
-                    <span class="stat-label">Active Donors</span>
+                <div className="stat-box">
+                    <span className="stat-number">10K+</span>
+                    <span className="stat-label">Active Donors</span>
                 </div>
-                <div class="stat-box">
-                    <span class="stat-number">200+</span>
-                    <span class="stat-label">Partner Organizations</span>
+                <div className="stat-box">
+                    <span className="stat-number">200+</span>
+                    <span className="stat-label">Partner Organizations</span>
                 </div>
             </div>
 
@@ -167,10 +174,10 @@ If you would like to collaborate, donate food, or need assistance using the plat
  Tamil Nadu, India.</p>
 
 <h3>📧 Email</h3>
-<p className="email" style={{color: "blue"}} onClick={() => window.location.href = "mailto:evrgrnsiva@gmail.com"}>evrgrnsiva@gmail.com</p>
+<p className="email" style={{color: "white"}} onClick={() => window.location.href = "mailto:evrgrnsiva@gmail.com"}>evrgrnsiva@gmail.com</p>
 
 <h3>📱 Phone</h3>
-<p className="email" style={{color: "blue"}} ><a href="tel:7010286162">+91 7010286162</a></p>
+<p className="email" style={{color: "white"}} ><a style={{color: "white"}} href="tel:7010286162">+91 7010286162</a></p>
 
 </div>
 
@@ -220,18 +227,18 @@ If you would like to collaborate, donate food, or need assistance using the plat
 
 <div className="footer">
 <footer>
-        <div class="footer-content">
-            <div class="footer-links">
+        <div className="footer-content">
+            <div className="footer-links">
                 <a href="#Home">Home</a>
                 <a href="#Features">Features</a>
                 <a href="#About">About</a>
                 <a href="#Contact">Contact</a>
             </div>
-            <div class="social-links">
-                <a href="#" ><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.instagram.com/donat.efood?igsh=ejBreWdnM3I2ejM2" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <div className="social-links">
+                <a href="#" ><i className="fab fa-facebook-f"></i></a>
+                <a href="#"><i className="fab fa-twitter"></i></a>
+                <a href="https://www.instagram.com/donat.efood?igsh=ejBreWdnM3I2ejM2" target="_blank"><i className="fab fa-instagram"></i></a>
+                <a href="#"><i className="fab fa-linkedin-in"></i></a>
             </div>
             <p>&copy; 2026 Food Waste Reduction System. All rights reserved.</p>
         </div>

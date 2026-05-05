@@ -88,7 +88,7 @@ useEffect(() => {
     localStorage.clear();
     setIsLoggedIn(false);
     setRole("");
-    navigate("/");
+    navigate("/login");
   };
 
   return (
