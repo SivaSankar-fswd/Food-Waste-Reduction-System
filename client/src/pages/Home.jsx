@@ -54,23 +54,25 @@ const handleChange = (e) => {
   });
 };
 
-const handleSubmit = async (e) => {
-  e.preventDefault();
+  const handleSubmit = async (e) => {
+    e.preventDefault();
 
-  if (!form.name || !form.email || !form.message) {
-   
-    return;
-  }
+    if (!form.name || !form.email || !form.message) {
+      return;
+    }
 
-  try {
-    await API.post("/contact", form);
-    setSuccess("Message sent successfully to admin!");
-    setForm({ name: "", email: "", message: "" });
-    setTimeout(() => setSuccess(""), 3000);
-  } catch {
-    alert("Failed to send message");
-  }
-};
+    try {
+      await API.post("/contact", form);
+      setSuccess("Message sent successfully to admin!");
+      setForm({ name: "", email: "", message: "" });
+      setTimeout(() => setSuccess(""), 3000);
+    } catch (error) {
+      console.error("Contact Form Error:", error);
+      const errorMsg = error.response?.data?.details || error.response?.data?.error || error.message || "Failed to send message";
+      alert(`Error: ${errorMsg}`);
+    }
+  };
+
 
 
   return (
