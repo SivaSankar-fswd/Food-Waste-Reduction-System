@@ -2,7 +2,7 @@ const db = require("../db");
 
 exports.addFood = (req, res) => {
   const donor_id = req.userId; // from token
-  const { food_name, quantity, location, contact, expiry_date, latitude, longitude } = req.body;
+  const { food_name, quantity, location, contact, expiry_date, latitude, longitude, photo } = req.body;
 
   // Validate required fields
   if (!food_name || !quantity || !location || !contact) {
@@ -12,9 +12,9 @@ exports.addFood = (req, res) => {
   const posted_date = new Date().toISOString();
 
   db.run(
-    `INSERT INTO food_posts (donor_id, food_name, quantity, location, contact, expiry_date, posted_date, latitude, longitude)
-     VALUES (?,?,?,?,?, ?,?,?,?)`,
-    [donor_id, food_name, quantity, location, contact, expiry_date, posted_date, latitude, longitude],
+    `INSERT INTO food_posts (donor_id, food_name, quantity, location, contact, expiry_date, posted_date, latitude, longitude, photo)
+     VALUES (?,?,?,?,?, ?,?,?,?,?)`,
+    [donor_id, food_name, quantity, location, contact, expiry_date, posted_date, latitude, longitude, photo],
     function(err) {
       if (err) {
         console.error("Database error:", err);

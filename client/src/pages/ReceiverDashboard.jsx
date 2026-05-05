@@ -58,7 +58,9 @@ function ReceiverDashboard() {
 
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (role !== "receiver") {
+    if (role === "admin") {
+      navigate("/admin");
+    } else if (role !== "receiver") {
       navigate("/donor");
     }
   }, []);
@@ -152,9 +154,10 @@ function ReceiverDashboard() {
             filteredFoods.map((item) => (
               <div className="food-card" key={item.id}>
                 <img
-                  src={getFoodImage(item.food_name)}
+                  src={item.photo || getFoodImage(item.food_name)}
                   alt={item.food_name}
                   className="food-img"
+                  style={{ objectFit: 'cover' }}
                 />
 
                 <div className="food-body" onClick={() => navigate(`/food/details/${item.id}`)} style={{ cursor: 'pointer' }}>
@@ -181,9 +184,7 @@ function ReceiverDashboard() {
                 >
                   Reject
                 </button> */}
-                    <p>
-                      <a href="tel:{item.contact}">✆ Call</a>
-                    </p>
+                    
 
                     <button
                       className="accept-btn"
@@ -208,9 +209,10 @@ function ReceiverDashboard() {
             filteredAccepted.map((item) => (
               <div className="food-card" key={item.id}>
                 <img
-                  src={getFoodImage(item.food_name)}
+                  src={item.photo || getFoodImage(item.food_name)}
                   alt={item.food_name}
                   className="food-img"
+                  style={{ objectFit: 'cover' }}
                 />
 
                 <div className="food-body" onClick={() => navigate(`/food/details/${item.id}`)} style={{ cursor: 'pointer' }}>
@@ -229,9 +231,7 @@ function ReceiverDashboard() {
 
                   
                   <br />
-                  <p>
-                    <a href={`tel:${item.contact}`}>✆ Call Donor</a>
-                  </p>
+                  
                 </div>
               </div>
             ))
@@ -264,28 +264,28 @@ function ReceiverDashboard() {
       )}
       <div className="footer">
         <footer>
-          <div class="footer-content">
-            <div class="footer-links">
+          <div className="footer-content">
+            <div className="footer-links">
               <a href="#Home">Home</a>
               <a href="#Features">Features</a>
               <a href="#About">About</a>
               <a href="#Contact">Contact</a>
             </div>
-            <div class="social-links">
+            <div className="social-links">
               <a href="#">
-                <i class="fab fa-facebook-f"></i>
+                <i className="fab fa-facebook-f"></i>
               </a>
               <a href="#">
-                <i class="fab fa-twitter"></i>
+                <i className="fab fa-twitter"></i>
               </a>
               <a
                 href="https://www.instagram.com/donat.efood?igsh=ejBreWdnM3I2ejM2"
                 target="_blank"
               >
-                <i class="fab fa-instagram"></i>
+                <i className="fab fa-instagram"></i>
               </a>
               <a href="#">
-                <i class="fab fa-linkedin-in"></i>
+                <i className="fab fa-linkedin-in"></i>
               </a>
             </div>
             <p>&copy; 2026 Food Waste Reduction System. All rights reserved.</p>

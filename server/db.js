@@ -5,6 +5,9 @@ require("dotenv").config();
 // Create a new pool using the connection string from environment variables
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ssl: process.env.DATABASE_URL && process.env.DATABASE_URL.includes("localhost") 
+    ? false 
+    : { rejectUnauthorized: false }
 });
 
 // Helper function to convert SQLite style '?' placeholders to PostgreSQL style '$1', '$2', etc.
@@ -76,8 +79,10 @@ const initDb = async () => {
       posted_date TEXT,
       accepted_date TEXT,
       latitude DOUBLE PRECISION,
-      longitude DOUBLE PRECISION
+      longitude DOUBLE PRECISION,
+      photo TEXT
     )`);
+    await pool.query(`ALTER TABLE food_posts ADD COLUMN IF NOT EXISTS photo TEXT`);
 
     // Insert default admin user if not exists
     const adminCheck = await pool.query("SELECT * FROM users WHERE email = $1", ["admin@foodwaste.com"]);
@@ -99,4 +104,4 @@ const initDb = async () => {
 // Run initialization
 initDb();
 
-module.exports = db;
+module.exports = { ...db, pool };

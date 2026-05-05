@@ -27,14 +27,11 @@ const handleLogin = async (e) => {
 
     // Role based redirect
     if (res.data.role === "admin") {
-      navigate("/");
+      navigate("/admin");
     } 
-    else if (res.data.role === "donor") {
+    else {
       navigate("/");
-    } 
-   else {
-     navigate("/");
-   }
+    }
 
 
   } catch (err) {

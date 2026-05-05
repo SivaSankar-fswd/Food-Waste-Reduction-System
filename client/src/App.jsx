@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
 
 import Home from "./pages/Home";
@@ -11,12 +11,14 @@ import AdminDashboard from "./pages/AdminDashboard";
 import Profile from "./pages/Profile";
 import FoodDetails from "./pages/FoodDetails";
 
-function App() {
-  return (
-    <BrowserRouter>
- <AIChatbot />
+function AppContent() {
+  const location = useLocation();
+  const isAdminPage = location.pathname === "/admin";
 
-      <Navbar />
+  return (
+    <>
+      {!isAdminPage && <AIChatbot />}
+      {!isAdminPage && <Navbar />}
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
@@ -27,6 +29,14 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/food/details/:id" element={<FoodDetails />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }

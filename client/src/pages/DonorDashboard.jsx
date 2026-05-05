@@ -11,6 +11,7 @@ function DonorDashboard() {
   const [foodName,setFoodName] = useState("");
   const [quantity,setQuantity] = useState("");
   const [location,setLocation] = useState("");
+  const [photo, setPhoto] = useState("");
   const [myFoods,setMyFoods] = useState([]);
   const navigate = useNavigate();
   const donorId = localStorage.getItem("userId");
@@ -40,9 +41,22 @@ function DonorDashboard() {
     }
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhoto(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   useEffect(() => {
     const role = localStorage.getItem("role");
-    if (role !== "donor") {
+    if (role === "admin") {
+      navigate("/admin");
+    } else if (role !== "donor") {
       navigate("/receiver");
     }
   }, []);
@@ -88,7 +102,8 @@ function DonorDashboard() {
     contact,
     expiry_date: expiryDate,
     latitude: coords.lat,
-    longitude: coords.lng
+    longitude: coords.lng,
+    photo: photo
   },
         { headers: { Authorization: token } }
       );
@@ -107,6 +122,7 @@ function DonorDashboard() {
       setLocation("");
       setContact("");
       setExpiryDate("");
+      setPhoto("");
       setCoords({ lat: null, lng: null });
 
     } catch (error) {
@@ -191,9 +207,10 @@ function DonorDashboard() {
          
 
             <img
-              src={getFoodImage(item.food_name)}
+              src={item.photo || getFoodImage(item.food_name)}
               alt={item.food_name}
               className="food-img"
+              style={{ objectFit: 'cover' }}
             />
 
             <div className="food-body">
@@ -241,6 +258,7 @@ function DonorDashboard() {
               <input placeholder="Quantity" value={quantity} onChange={(e)=>setQuantity(e.target.value)} required />
               <input placeholder="Location" value={location} onChange={(e)=>setLocation(e.target.value)} required />
               
+             
               <button 
                 type="button" 
                 className="btn btn-outline-primary mb-3 w-100" 
@@ -249,6 +267,9 @@ function DonorDashboard() {
               >
                 {showMap ? "Hide Map" : "📍 Select on Map"}
               </button>
+
+               
+
 
               {showMap && (
                 <MapPicker 
@@ -262,8 +283,18 @@ function DonorDashboard() {
                   }} 
                 />
               )}
+              <div className="form-group mb-3">
+                <label className="form-label text-white-50 small">Upload Food Photo</label>
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  onChange={handlePhotoChange}
+                  className="form-control bg-dark text-white border-secondary"
+                  style={{ borderRadius: '8px' }}
+                />
+              </div>
               <input placeholder="Contact" value={contact} onChange={(e)=>setContact(e.target.value)} required />
-              <label for="expiry">Expiry Date:
+              <label htmlFor="expiry">Expiry Date:
               <input placeholder="Best Before"
               id="expiry"
   type="date"
@@ -297,18 +328,18 @@ function DonorDashboard() {
       )}
       <div className="footer">
 <footer>
-        <div class="footer-content">
-            <div class="footer-links">
+        <div className="footer-content">
+            <div className="footer-links">
                 <a href="#Home">Home</a>
                 <a href="#Features">Features</a>
                 <a href="#About">About</a>
                 <a href="#Contact">Contact</a>
             </div>
-            <div class="social-links">
-                <a href="#" ><i class="fab fa-facebook-f"></i></a>
-                <a href="#"><i class="fab fa-twitter"></i></a>
-                <a href="https://www.instagram.com/donat.efood?igsh=ejBreWdnM3I2ejM2" target="_blank"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-linkedin-in"></i></a>
+            <div className="social-links">
+                <a href="#" ><i className="fab fa-facebook-f"></i></a>
+                <a href="#"><i className="fab fa-twitter"></i></a>
+                <a href="https://www.instagram.com/donat.efood?igsh=ejBreWdnM3I2ejM2" target="_blank"><i className="fab fa-instagram"></i></a>
+                <a href="#"><i className="fab fa-linkedin-in"></i></a>
             </div>
             <p>&copy; 2026 Food Waste Reduction System. All rights reserved.</p>
         </div>
