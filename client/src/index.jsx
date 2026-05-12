@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import "./App.css";
 import { registerSW } from 'virtual:pwa-register'
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 // Register service worker
 const updateSW = registerSW({
@@ -18,5 +19,11 @@ const updateSW = registerSW({
 })
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
-root.render(<App />);
+root.render(
+  <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+    <App />
+  </GoogleOAuthProvider>
+);
+
+
 
