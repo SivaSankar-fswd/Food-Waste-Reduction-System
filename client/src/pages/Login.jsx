@@ -2,6 +2,7 @@ import { useState } from "react";
 import API from "../services/api";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
+import { GoogleLogin } from "@react-oauth/google";
 import "./Login.css";
 import loginImg from "../assets/login-illustration.png";
 
@@ -36,6 +37,29 @@ const handleLogin = async (e) => {
 
   } catch (err) {
     alert("Not have an account. please Register.");
+  }
+};
+
+const handleGoogleSuccess = async (credentialResponse) => {
+  try {
+    const res = await API.post("/auth/google-login", {
+      token: credentialResponse.credential,
+    });
+
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("role", res.data.role);
+    localStorage.setItem("userId", res.data.id);
+
+    window.dispatchEvent(new Event("storage"));
+
+    if (res.data.role === "admin") {
+      navigate("/admin");
+    } else {
+      navigate("/");
+    }
+  } catch (err) {
+    console.error("Google Login Error:", err);
+    alert("Google login failed. Please try again.");
   }
 };
 
@@ -92,6 +116,24 @@ const handleLogin = async (e) => {
           </button>
         </form>
 
+        <div className="or-separator">
+          <div className="line"></div>
+          <span>or</span>
+          <div className="line"></div>
+        </div>
+
+        <div className="google-login-container">
+          <GoogleLogin
+            onSuccess={handleGoogleSuccess}
+            onError={() => {
+              console.log("Login Failed");
+            }}
+            text="continue_with"
+            shape="rectangular"
+            width="100%"
+          />
+        </div>
+
         <p className="switch-text">
           Don't have an account?
           <span onClick={() => navigate("/register")}> Sign up</span>
@@ -105,3 +147,4 @@ const handleLogin = async (e) => {
 }
 
 export default Login;
+

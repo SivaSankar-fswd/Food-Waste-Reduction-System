@@ -247,6 +247,33 @@
   left: 150%;
 }
 
+.or-separator {
+  display: flex;
+  align-items: center;
+  margin: 20px 0;
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 14px;
+}
+
+.or-separator .line {
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.or-separator span {
+  margin: 0 10px;
+  text-transform: lowercase;
+  font-style: italic;
+}
+
+.google-login-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
 .switch-text {
   margin-top: 15px;
   font-size: 14px;
